@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f4eb">
+  <title>鹈鹕的漫游日记 · Pelican Sunday</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f7f4eb; color: #243f3a; font-family: "Segoe UI", "Microsoft YaHei", sans-serif; }
+    main { max-width: 1240px; margin: auto; padding: 38px 48px 26px; }
+    header, .controls, footer, .brand { display: flex; align-items: center; }
+    header { justify-content: space-between; padding-bottom: 27px; border-bottom: 1px solid #d9ded1; }
+    .brand { gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: 3px; }
+    .brand-mark { width: 20px; height: 20px; border: 2px solid #2c5548; border-radius: 50%; position: relative; }
+    .brand-mark::after { content: ''; position: absolute; width: 9px; height: 2px; background: #2c5548; transform: rotate(-45deg); top: 7px; left: 3px; }
+    .edition { font-size: 11px; letter-spacing: 2px; color: #67776a; }
+    .intro { text-align: center; padding: 39px 0 25px; }
+    .eyebrow { margin: 0 0 12px; font-size: 10px; letter-spacing: 4px; color: #76856c; }
+    h1 { margin: 0; font-family: Georgia, "Songti SC", "SimSun", serif; font-size: clamp(29px, 4vw, 46px); font-weight: 500; letter-spacing: 5px; }
+    .subtitle { font-size: 13px; margin: 14px 0 0; color: #748172; letter-spacing: 2px; }
+    .scene { position: relative; overflow: hidden; border-radius: 15px; background: #e8efe4; }
+    .scene > svg { display: block; width: 100%; height: auto; }
+    .scene-label { position: absolute; top: 24px; left: 27px; display: flex; align-items: center; gap: 8px; font-size: 10px; color: #526b5c; letter-spacing: 2px; }
+    .scene-label i { width: 5px; height: 5px; border-radius: 50%; background: #739b77; }
+    .scene-number { position: absolute; right: 25px; bottom: 21px; color: #557261; font-size: 10px; letter-spacing: 2px; }
+    .controls { justify-content: center; flex-wrap: wrap; gap: 23px; padding: 24px 0; }
+    button { background: #284b3e; color: #fffdf4; border: 0; border-radius: 24px; min-height: 44px; padding: 0 23px; font: inherit; font-size: 12px; cursor: pointer; display: inline-flex; gap: 10px; align-items: center; }
+    button:hover { background: #3a6350; }
+    button:focus-visible, input:focus-visible { outline: 3px solid #d78a45; outline-offset: 5px; }
+    .pause-icon { display: inline-block; width: 10px; height: 12px; border-left: 3px solid currentColor; border-right: 3px solid currentColor; }
+    .paused .pause-icon { width: 0; height: 0; border: 6px solid transparent; border-right: 0; border-left: 9px solid currentColor; }
+    .speed { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #607462; }
+    input[type="range"] { width: 108px; accent-color: #466b50; cursor: pointer; min-height: 28px; }
+    output { min-width: 32px; font-size: 11px; font-variant-numeric: tabular-nums; }
+    footer { justify-content: space-between; border-top: 1px solid #d9ded1; padding-top: 19px; color: #7d897b; font-size: 10px; letter-spacing: 1.5px; }
+    footer span:last-child { font-family: Georgia, serif; font-style: italic; font-size: 12px; }
+    body { --paper: #f7f4eb; --ink: #243f3a; --muted: #748172; --line: #d9ded1; --accent: #466b50; --sky-top: #e7eee2; --sky-bottom: #f6f1d9; --water-top: #b8d3c7; --water-bottom: #d3dfc9; --hill: #c8d8bd; --bank: #bdc99e; --road: #d5d3b6; --edge: #e9e4c6; --label: #526b5c; --sun: #f3d78f; background: var(--paper); color: var(--ink); transition: background-color 1.6s, color 1.6s; }
+    body[data-scene="meadow"] { --paper: #f5f3e8; --ink: #40523c; --muted: #78856b; --line: #dce0cd; --accent: #687e4c; --sky-top: #e6eddf; --sky-bottom: #faf0d5; --water-top: #c5d3a4; --water-bottom: #b4c58e; --hill: #d0dbb8; --bank: #a8bc89; --road: #dbd2b3; --edge: #eee6cd; --label: #526543; --sun: #f4dc9d; }
+    body[data-scene="autumn"] { --paper: #f8f0e5; --ink: #674e3d; --muted: #91785f; --line: #e4d7c3; --accent: #9b704b; --sky-top: #edddcb; --sky-bottom: #f9e8c6; --water-top: #b9c6b1; --water-bottom: #d5d2ad; --hill: #d4c2a0; --bank: #c9b388; --road: #d9c4a5; --edge: #f0dfc1; --label: #74593e; --sun: #ecc181; }
+    body[data-scene="night"] { --paper: #202f38; --ink: #e9e7d9; --muted: #afc1bb; --line: #43565b; --accent: #9fb9aa; --sky-top: #334854; --sky-bottom: #82918d; --water-top: #6a8789; --water-bottom: #91a5a0; --hill: #66817e; --bank: #748d80; --road: #9aa998; --edge: #bbc5ae; --label: #e2e8d7; --sun: #f3edce; }
+    body[data-scene="sakura"] { --paper: #fbf0f1; --ink: #73505d; --muted: #947782; --line: #ead5dc; --accent: #b7758e; --sky-top: #f1dee5; --sky-bottom: #fff0e5; --water-top: #e3cbd1; --water-bottom: #ecd8d5; --hill: #dac6cf; --bank: #d4bcc1; --road: #e7d3cc; --edge: #f9e8e2; --label: #815568; --sun: #f9e2bc; }
+    body[data-scene="osmanthus"] { --paper: #f8f3e3; --ink: #54583a; --muted: #838061; --line: #e3ddc2; --accent: #8b8e50; --sky-top: #e7e9d6; --sky-bottom: #fbefc9; --water-top: #c5cfaa; --water-bottom: #d3d3a9; --hill: #c8cfad; --bank: #b8c18e; --road: #d9cea7; --edge: #f1e5bf; --label: #606640; --sun: #f3d48a; }
+    header, footer { border-color: var(--line); transition: border-color 1.6s; }
+    .brand-mark { border-color: var(--ink); } .brand-mark::after { background: var(--ink); }
+    .edition, .eyebrow, .subtitle, footer, .speed { color: var(--muted); transition: color 1.6s; }
+    .scene-label, .scene-number { color: var(--label); transition: color 1.6s; }
+    .scene-label i { background: currentColor; }
+    .landscape { opacity: 0; pointer-events: none; }
+    .landscape.is-visible { opacity: 1; }
+    .world { pointer-events: none; }
+    .world[data-world="night"] [data-node="dayBirds"] { opacity: 0; }
+    .world[data-world="night"] [data-node="clouds"] { opacity: .2; }
+    .world[data-world="meadow"] [data-node="waves"] { opacity: 0; }
+    .world[data-world="sakura"] [data-node="waves"], .world[data-world="osmanthus"] [data-node="waves"] { opacity: 0; }
+    .route.is-pending { border-style: dashed; }
+    .routes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0 0; }
+    .route { border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--ink); padding: 14px 17px; min-height: 77px; text-align: left; gap: 12px; transition: background-color .3s, border-color .3s; }
+    .route:hover { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+    .route[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: var(--accent); }
+    .route-copy { display: grid; gap: 5px; } .route strong { font-size: 13px; font-weight: 500; letter-spacing: 1px; }
+    .route small { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+    .swatch { flex: 0 0 35px; height: 35px; border-radius: 50%; overflow: hidden; position: relative; background: linear-gradient(#e8ecd9 50%, #b9d1c4 50%); }
+    .swatch::after { content: ''; position: absolute; width: 40px; height: 19px; border-radius: 50%; background: #9bb695; left: -8px; bottom: -3px; }
+    .swatch::before { content: ''; position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #f4dca0; right: 7px; top: 6px; }
+    .meadow-swatch { background: linear-gradient(#f1ecd2 50%, #bccf99 50%); } .meadow-swatch::after { background: #92ac78; }
+    .autumn-swatch { background: linear-gradient(#f3dfbf 50%, #c7b08b 50%); } .autumn-swatch::after { background: #bc865c; }
+    .night-swatch { background: linear-gradient(#3d535f 50%, #7d9691 50%); } .night-swatch::after { background: #527570; } .night-swatch::before { background: #f4edce; }
+    .sakura-swatch { background: linear-gradient(#f4e2e6 50%, #e8c0cf 50%); } .sakura-swatch::after { background: #cd98b0; } .sakura-swatch::before { background: #fff2e5; }
+    .osmanthus-swatch { background: linear-gradient(#f4e9bd 50%, #a5b282 50%); } .osmanthus-swatch::after { background: #7f9567; } .osmanthus-swatch::before { background: #e7bb5b; }
+    .auto-label { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; min-height: 44px; cursor: pointer; }
+    .auto-label input { width: 15px; height: 15px; accent-color: var(--accent); }
+    .journey-caption { margin: 12px 0 0; text-align: center; color: var(--muted); font-size: 11px; letter-spacing: 1px; }
+    input[type="range"] { accent-color: var(--accent); }
+    @media (prefers-reduced-motion: reduce) { *, #scene stop, #scene .palette { transition: none !important; } }
+    @media (max-width: 760px) { .routes { grid-template-columns: repeat(2, 1fr); } .route { min-height: 68px; padding: 11px 13px; } }
+    @media (max-width: 600px) { main { padding: 22px 16px; } header { padding-bottom: 20px; } .edition { font-size: 9px; letter-spacing: 1px; } .brand { font-size: 10px; letter-spacing: 2px; } .intro { padding: 31px 0 23px; } .subtitle { font-size: 11px; letter-spacing: 1px; } .scene > svg { width: 155%; max-width: none; margin-left: -27.5%; } .scene-label { top: 16px; left: 16px; font-size: 8px; } .scene-number { display: none; } .controls { gap: 17px; } footer { letter-spacing: .5px; font-size: 9px; } }
+  </style>
+</head>
+<body data-scene="coast">
+<main>
+  <header><div class="brand"><span class="brand-mark" aria-hidden="true"></span> SLOW SUNDAY</div><span class="edition">六程风景 / 一路慢行</span></header>
+  <section class="intro"><p class="eyebrow">SIX PLACES, ONE LITTLE JOURNEY</p><h1>鹈鹕的漫游日记</h1><p class="subtitle" id="sceneSubtitle">海风刚刚好，今天不赶路。</p></section>
+  <section class="scene" aria-label="鹈鹕骑自行车的循环动画">
+    <div class="scene-label"><i></i><span id="sceneLabel">沿着海岸 · 慢慢向前</span></div>
+    <svg id="scene" viewBox="0 0 1120 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="art-title art-desc">
+      <title id="art-title">一只系着橘色围巾的鹈鹕，在海岸边骑绿色自行车</title>
+      <desc id="art-desc">鹈鹕交替踩动踏板，围巾随风飘动。暂停时缓缓减速，再次出发时柔和加速。可选择海岸、花野、粉色樱花林、金色桂花小径、秋湖或月夜。樱花瓣随风旋落，桂花细密成簇。新风景从右侧逐渐进入，近处草木与远景错落衔接。下方可以调速或开启自动漫游。</desc>
+      <defs>
+        <linearGradient id="sky" x2="0" y2="1"><stop style="stop-color:var(--sky-top)"/><stop offset="1" style="stop-color:var(--sky-bottom)"/></linearGradient>
+        <linearGradient id="sea" x2="0" y2="1"><stop style="stop-color:var(--water-top)"/><stop offset="1" style="stop-color:var(--water-bottom)"/></linearGradient>
+        <linearGradient id="pouch" x2="0" y2="1"><stop stop-color="#efbd6f"/><stop offset="1" stop-color="#df9b55"/></linearGradient>
+        <pattern id="roadMarks" width="240" height="8" patternUnits="userSpaceOnUse"><path d="M20 4h72" stroke="#f8f4dc" stroke-width="3" stroke-linecap="round"/></pattern>
+        <g id="cloud" fill="#faf9ed"><path d="M0 23c1-13 15-18 26-12C34-9 65-4 69 14c15-7 29 1 29 12H0Z"/></g>
+        <g id="grass" fill="none" stroke="#78916a" stroke-width="3" stroke-linecap="round"><path d="M0 0q-2-20-10-25M0 0q8-25 18-29M0 0q-12-12-21-10"/></g>
+        <g id="flower"><path d="M0 0q5-25 1-40" fill="none" stroke="#6f8864" stroke-width="2"/><path d="M1-15q-13-12-14-3 6 9 14 3" fill="#8fa37c"/><g fill="#f7f2d8"><ellipse cx="1" cy="-43" rx="4" ry="9"/><ellipse cx="1" cy="-43" rx="4" ry="9" transform="rotate(60 1 -43)"/><ellipse cx="1" cy="-43" rx="4" ry="9" transform="rotate(120 1 -43)"/></g><circle cx="1" cy="-43" r="3" fill="#dfab52"/></g>
+        <g id="pine"><path d="M0 0v-117" stroke="#586e67" stroke-width="5"/><path d="m0-138-30 54h16l-28 37h20l-29 34H51L22-47h20L14-84h16Z" fill="currentColor"/></g>
+        <g id="autumnTree"><path d="M0 0v-136" stroke="#887b5a" stroke-width="7"/><path d="M0-59-26-29M0-78l23-26" fill="none" stroke="#887b5a" stroke-width="4"/><path d="M-3-169c-39-3-59 38-45 61-31 27-8 64 20 60 19 18 41 13 50-3 42 7 64-36 38-60 8-28-22-59-63-58Z" fill="currentColor"/><path d="M0-33v-99m0 49-20-18m20 2 23-23" fill="none" stroke="#987d59" stroke-width="2.5" opacity=".55"/></g>
+        <g id="cosmos"><path d="M0 0q-5-24 0-36m-1 22q8-9 13-7" fill="none" stroke="#758e60" stroke-width="2"/><g fill="currentColor"><ellipse cy="-37" rx="4" ry="10"/><ellipse cy="-37" rx="4" ry="10" transform="rotate(60 0 -37)"/><ellipse cy="-37" rx="4" ry="10" transform="rotate(120 0 -37)"/></g><circle cy="-37" r="3" fill="#f3d797"/></g>
+        <g id="windmill"><path d="m-15 0 6-71h18l6 71Z" fill="#f2e9cb" stroke="#aaa780" stroke-width="2"/><path d="m-15-69 15-15 15 15Z" fill="#9eaa84"/><path d="M-4 0v-15q4-6 8 0V0" fill="#89997c"/><g class="windmill-sails"><path d="M0-69v-39h9v31ZM0-69h39v9H8ZM0-69v39h-9v-31ZM0-69h-39v-9h31Z" fill="#fff5db" stroke="#a1a486" stroke-width="1.8"/><circle cy="-69" r="4" fill="#8b9a7a"/></g></g>
+        <path id="sakuraPetal" d="M0 0C-6-5-5-12-2-14L0-11 2-14C6-11 6-5 0 0Z"/>
+        <g id="sakuraBloom" fill="currentColor"><use href="#sakuraPetal"/><use href="#sakuraPetal" transform="rotate(72)"/><use href="#sakuraPetal" transform="rotate(144)"/><use href="#sakuraPetal" transform="rotate(216)"/><use href="#sakuraPetal" transform="rotate(288)"/><circle r="2.4" fill="#ddac90"/></g>
+        <g id="sakuraTree">
+          <path d="M-8 0Q3-69-5-130L7-145Q10-74 8 0Z" fill="#a28a83"/>
+          <path d="M0-62-41-47M4-96l47-40M-2-118l-13-49" fill="none" stroke="#a28a83" stroke-width="7" stroke-linecap="round"/>
+          <path d="M-75-107C-106-126-95-160-71-168c-6-31 31-55 55-37 22-32 67-21 73 7 37-2 61 26 44 53 30 38-3 66-40 57-20 23-62 15-68-4-25 18-57 6-68-15Z" fill="currentColor"/>
+          <path d="M-71-157q20-34 44-17 19-30 48-11 24-18 46 9M-51-121q13-16 27-8m49-23q18-22 39-9" fill="none" stroke="#f9dbe5" stroke-width="16" stroke-linecap="round" opacity=".48"/>
+          <path d="M0-89-20-35m23 26 34-37" fill="none" stroke="#ad8f92" stroke-width="2.3" opacity=".5"/>
+          <g color="#fff0f2"><use href="#sakuraBloom" transform="translate(-58 -153) scale(.58)"/><use href="#sakuraBloom" transform="translate(-18 -180) scale(.72)"/><use href="#sakuraBloom" transform="translate(41 -162) scale(.63)"/><use href="#sakuraBloom" transform="translate(72 -124) scale(.48)"/><use href="#sakuraBloom" transform="translate(-29 -119) scale(.57)"/><use href="#sakuraBloom" transform="translate(21 -105) scale(.65)"/></g>
+          <g fill="#f7e0e7" opacity=".8"><circle cx="-75" cy="-130" r="3"/><circle cx="-2" cy="-151" r="3.5"/><circle cx="29" cy="-193" r="3"/><circle cx="56" cy="-101" r="2.5"/><circle cx="-48" cy="-179" r="2"/></g>
+        </g>
+        <g id="osmanthusBloom" fill="currentColor"><ellipse cy="-3" rx="2.5" ry="3.5"/><ellipse cx="3" rx="3.5" ry="2.5"/><ellipse cy="3" rx="2.5" ry="3.5"/><ellipse cx="-3" rx="3.5" ry="2.5"/><circle r="1.3" fill="#b78b42"/></g>
+        <g id="osmanthusCluster" color="#f3d483"><use href="#osmanthusBloom" transform="translate(-8 -3) scale(.68)"/><use href="#osmanthusBloom" transform="translate(1 -7) scale(.8)"/><use href="#osmanthusBloom" transform="translate(8 2) scale(.62)"/><use href="#osmanthusBloom" transform="translate(-2 5) scale(.7)"/></g>
+        <g id="osmanthusLeaf"><path d="M0 0Q-21-26-7-35Q12-24 0 0Z" fill="currentColor"/><path d="M0-3-5-28" fill="none" stroke="#cad3a2" stroke-width="1" opacity=".55"/></g>
+        <g id="osmanthusTree">
+          <path d="M-7 0-4-151h9L7 0Z" fill="#89876a"/><path d="M0-54-33-38M1-74l39-36" fill="none" stroke="#89876a" stroke-width="6" stroke-linecap="round"/>
+          <path d="M-66-81c-30-15-31-51-9-72-7-30 17-57 44-50 24-36 69-26 79 3 36-5 67 24 53 59 23 31 2 66-30 65-20 21-57 18-71 1-21 16-46 10-66-6Z" fill="currentColor"/>
+          <path d="M-55-154q8-31 32-20 23-29 47-12M39-147q19-19 35-7" stroke="#adb983" stroke-width="19" stroke-linecap="round" fill="none" opacity=".35"/>
+          <g color="#71895e"><use href="#osmanthusLeaf" transform="translate(-47 -124) rotate(-34)"/><use href="#osmanthusLeaf" transform="translate(9 -145) rotate(32)"/><use href="#osmanthusLeaf" transform="translate(49 -102) rotate(51)"/><use href="#osmanthusLeaf" transform="translate(-6 -91) rotate(-55)"/></g>
+          <use href="#osmanthusCluster" x="-50" y="-145"/><use href="#osmanthusCluster" x="-16" y="-181"/><use href="#osmanthusCluster" x="28" y="-169"/><use href="#osmanthusCluster" x="65" y="-136"/><use href="#osmanthusCluster" x="-68" y="-109"/><use href="#osmanthusCluster" x="-18" y="-124"/><use href="#osmanthusCluster" x="20" y="-101"/><use href="#osmanthusCluster" x="57" y="-82"/>
+        </g>
+        <g id="wheel" fill="none">
+          <circle r="79" fill="#f3e6c7" stroke="#2c4541" stroke-width="9"/>
+          <circle r="70" fill="#e3e9d7" fill-opacity=".48" stroke="#adb8a4" stroke-width="2"/>
+          <g class="spokes" stroke="#8e9f90" stroke-width="1.7"><path d="M-68 0H68M0-68V68M-48-48 48 48M-48 48 48-48M-63-26 63 26M-26-63 26 63M-63 26 63-26M-26 63 26-63"/><circle r="61" stroke="#c5ccb9" stroke-width="1"/><path d="M-4-57h8v13h-8z" fill="#fcf7df" stroke="none"/></g>
+          <circle r="8" fill="#f3e8cc" stroke="#526b5a" stroke-width="3"/>
+        </g>
+      </defs>
+      <g id="sceneBack">
+      <rect width="1120" height="580" fill="url(#sky)"/>
+      <circle class="palette" cx="865" cy="128" r="48" style="fill:var(--sun)"/>
+      <circle class="palette" cx="865" cy="128" r="61" style="fill:var(--sun)" opacity=".12"/>
+      <g class="landscape" data-landscape="night">
+        <g fill="#d3d5bb" opacity=".45"><circle cx="848" cy="114" r="9"/><circle cx="881" cy="145" r="6"/><circle cx="885" cy="112" r="4"/></g>
+        <g id="stars" fill="#f9edcb"><circle cx="120" cy="94" r="1.8"/><circle cx="230" cy="148" r="2"/><circle cx="330" cy="74" r="1.5"/><circle cx="461" cy="130" r="1.6"/><circle cx="704" cy="73" r="2"/><circle cx="964" cy="91" r="1.5"/><circle cx="1026" cy="187" r="2"/><circle cx="759" cy="185" r="1.5"/><circle cx="373" cy="189" r="1.4"/><path d="m171 203 2-6 2 6 6 2-6 2-2 6-2-6-6-2Zm816-144 1.5-5 1.5 5 5 1.5-5 1.5-1.5 5-1.5-5-5-1.5Z"/></g>
+        <path d="m-20 335 146-144 66 64 88-103 146 169 78-61 112 92 87-108 76 66 122-111 151 150Z" fill="#637e82"/>
+        <path d="m241 198 39-46 48 55-30-13-16 7-17-13Z" fill="#a1b0a6" opacity=".55"/>
+        <path d="m-20 351 146-103 81 71 76-40 115 76 193-74 119 70 143-88 152 66 135-55v136H-20Z" fill="#78918b"/>
+      </g>
+      <g id="clouds"><use href="#cloud" x="146" y="112" opacity=".75"/><use href="#cloud" x="675" y="69" opacity=".75"/><use href="#cloud" x="1000" y="171" opacity=".5"/></g>
+      <g id="dayBirds" fill="none" stroke="#91a595" stroke-width="2" stroke-linecap="round"><path d="M781 213q7-8 14 0 7-8 14 0M846 230q5-6 10 0 5-6 10 0"/></g>
+      <path class="palette" d="M0 311q98-50 196-20 90-59 204-5 73-22 161 24 66-45 149-24 88-24 196 20 125-36 214-7v75H0Z" style="fill:var(--hill)"/>
+      <path d="M0 337q147-29 305-4 167-28 339-8 220-21 476 1v106H0Z" fill="url(#sea)"/>
+      <g id="waves" fill="none" stroke="#eef0d9" stroke-width="2" stroke-linecap="round" opacity=".8"><path d="M40 353h75m89 17h92m142-24h64m88 34h106m54-29h72m107 22h96M-110 396h63m185 6h76m118-10h104m273 12h98m170-8h81m158-16h57"/></g>
+      <g class="landscape is-visible" data-landscape="coast">
+        <g data-drift="12" data-period="1280">
+          <g transform="translate(167 324)"><path d="m-17 0 7-73h20l7 73Z" fill="#f1e9cf"/><path d="m-13-42 2-14h22l2 14Z" fill="#bb8c72"/><path d="M-13-73h26v-15h-26Z" fill="#708a80"/><path d="m-18-88 18-13 18 13Z" fill="#829989"/><path d="M-6-86h12v11H-6Z" fill="#f0d79a"/><path d="M-28 0h56" stroke="#a0b49b" stroke-width="4"/></g>
+          <g transform="translate(981 354)"><path d="M-27 0h54l-8 9h-38Z" fill="#809c91"/><path d="M0-48V0" stroke="#91a499" stroke-width="2"/><path d="M-4-45-26-5h22ZM3-36 22-5H3Z" fill="#faf4de"/><path d="M-23 15h46" stroke="#e5e9d4" stroke-width="2"/></g>
+        </g>
+      </g>
+      <g class="landscape" data-landscape="meadow">
+        <path d="M0 357q155-60 326-4 150 49 349-3 217-51 445-3v84H0Z" fill="#b9cba0"/>
+        <path d="M0 393q199-52 396-6 121 20 267-15 222-40 457 19v57H0Z" fill="#aec18e"/>
+        <g fill="none" stroke="#d6ddad" stroke-width="3" opacity=".8"><path d="M20 409q141-54 267-26M93 426q134-54 281-21M759 395q169-36 296-6"/></g>
+        <g data-drift="14" data-period="1280"><use href="#windmill" x="206" y="324"/><g transform="translate(924 337)"><path d="M-28 0v-31h56V0" fill="#e9dfba"/><path d="m-37-31 37-28 37 28Z" fill="#a6a27c"/><path d="M-5 0v-18H6V0M-20-22h8v9h-8m25-9h8v9h-8" fill="#8c9f82"/></g></g>
+        <g data-drift="73" data-period="1280" color="#e5b3a3"><use href="#cosmos" x="60" y="431"/><use href="#cosmos" x="88" y="436"/><use href="#cosmos" x="253" y="427"/><use href="#cosmos" x="883" y="426"/><use href="#cosmos" x="914" y="432"/><use href="#cosmos" x="1090" y="431"/><g color="#f4ebc8"><use href="#cosmos" x="112" y="436"/><use href="#cosmos" x="227" y="434"/><use href="#cosmos" x="943" y="435"/></g></g>
+      </g>
+      <g class="landscape" data-landscape="autumn">
+        <path d="M0 331q97-34 179 4t156 0q102-26 205-1t178-1q161-33 402-3v14H0Z" fill="#bfad85"/>
+        <g opacity=".24" fill="#e5c78f"><path d="m826 349 78 0 13 5H813Zm-7 13h94l-9 6h-77Zm-18 16h131l-16 7H818Zm-19 24h165l-7 5H790Z"/></g>
+        <g data-drift="29" data-period="1280"><g color="#c1a16e"><use href="#autumnTree" transform="translate(59 416) scale(.92)"/></g><g color="#d2b17a"><use href="#autumnTree" transform="translate(149 407) scale(.77)"/></g><g color="#bd8e65"><use href="#autumnTree" transform="translate(1014 424) scale(1.16)"/></g><g color="#d3b583"><use href="#autumnTree" transform="translate(1100 418) scale(.8)"/></g></g>
+      </g>
+      <g class="landscape" data-landscape="sakura">
+        <path d="M0 348q193-30 375 3t350-9q175-28 395 8v96H0Z" fill="#e4cdd2"/>
+        <g data-drift="14" data-period="1280" color="#dfc3ce" opacity=".65"><use href="#sakuraTree" transform="translate(289 359) scale(.53)"/><use href="#sakuraTree" transform="translate(405 354) scale(.46)"/><use href="#sakuraTree" transform="translate(807 364) scale(.57)"/><use href="#sakuraTree" transform="translate(1140 350) scale(.49)"/></g>
+        <path d="M0 405q219-46 400-10t350-6q170-26 370 20v39H0Z" fill="#d9c2c7"/>
+        <g data-drift="38" data-period="1280"><g color="#e3b0c5"><use href="#sakuraTree" transform="translate(95 436) scale(1.56)"/></g><g color="#ebbed0"><use href="#sakuraTree" transform="translate(270 422) scale(.98)"/></g><g color="#dea9c0"><use href="#sakuraTree" transform="translate(984 433) scale(1.46)"/></g><g color="#e8b9cd"><use href="#sakuraTree" transform="translate(1172 428) scale(1.07)"/></g></g>
+        <path d="M0 431q180-11 327 1t346-4 447 4" fill="none" stroke="#f6dde5" stroke-width="5" opacity=".7"/>
+      </g>
+      <g class="landscape" data-landscape="osmanthus">
+        <path d="M0 345q235-27 475 10t380-6q165-32 265 6v83H0Z" fill="#c8cfaa"/>
+        <g data-drift="13" data-period="1280" color="#a4b28b" opacity=".62"><use href="#osmanthusTree" transform="translate(290 362) scale(.56)"/><use href="#osmanthusTree" transform="translate(439 356) scale(.46)"/><use href="#osmanthusTree" transform="translate(805 363) scale(.58)"/><use href="#osmanthusTree" transform="translate(1170 359) scale(.49)"/></g>
+        <path d="M0 403q202-44 400-9t391 0q173-33 329 10v38H0Z" fill="#bcc699"/>
+        <g data-drift="36" data-period="1280"><g color="#8b9e70"><use href="#osmanthusTree" transform="translate(81 436) scale(1.51)"/></g><g color="#9eaf7e"><use href="#osmanthusTree" transform="translate(260 425) scale(.98)"/></g><g color="#879c70"><use href="#osmanthusTree" transform="translate(973 433) scale(1.44)"/></g><g color="#9baa7b"><use href="#osmanthusTree" transform="translate(1162 426) scale(1.03)"/></g></g>
+        <g data-drift="75" data-period="1280" color="#e9cf86"><use href="#osmanthusCluster" x="142" y="428"/><use href="#osmanthusCluster" x="168" y="432"/><use href="#osmanthusCluster" x="360" y="432"/><use href="#osmanthusCluster" x="861" y="431"/><use href="#osmanthusCluster" x="1090" y="430"/></g>
+      </g>
+      <g class="landscape" data-landscape="night">
+        <g fill="#ede8c9" opacity=".28"><path d="M834 341h63l11 4h-88Zm-20 15h105l-7 4h-91Zm-17 19h139l9 4H788Zm-17 22h171l-11 4H791Z"/></g>
+        <g data-drift="26" data-period="1280" color="#507571"><use href="#pine" transform="translate(45 421) scale(.94)"/><use href="#pine" transform="translate(130 418) scale(.7)"/><use href="#pine" transform="translate(974 418) scale(.85)"/><use href="#pine" transform="translate(1080 425) scale(1.3)"/></g>
+      </g>
+      <path class="palette" d="M0 437q134-19 289 0 135-26 299-8 222-19 532 2v81H0Z" style="fill:var(--bank)"/>
+      <path class="palette" d="M0 449q273-11 560 0t560 0v131H0Z" style="fill:var(--road)"/>
+      <path class="palette" d="M0 453q270-11 560 0t560 0" fill="none" style="stroke:var(--edge)" stroke-width="5"/>
+      <rect id="road" x="0" y="527" width="1120" height="8" fill="url(#roadMarks)"/>
+      <g id="plantsBack"><use href="#grass" x="105" y="442"/><use href="#grass" x="909" y="440"/><use href="#flower" x="944" y="444"/><use href="#flower" x="963" y="442" transform="rotate(10 963 442)"/></g>
+      </g>
+      <ellipse id="shadow" cx="562" cy="504" rx="224" ry="13" fill="#627c5b" opacity=".17"/>
+      <g id="rider">
+        <!-- Wheels and frame remain mechanically aligned. -->
+        <g transform="translate(402 417)"><use href="#wheel"/><g id="rearSpin"/></g>
+        <g transform="translate(709 417)"><use href="#wheel"/><g id="frontSpin"/></g>
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M325 401a79 79 0 0 1 151-15M635 385a79 79 0 0 1 151 11" stroke="#728b71" stroke-width="6"/>
+          <path d="M402 417 480 303 548 420 402 417 638 313 548 420M480 303 638 313M638 313 709 417" stroke="#355c4c" stroke-width="11"/>
+          <path d="M402 417 480 303 548 420M480 303 638 313M645 325 709 417" stroke="#6e9270" stroke-width="4"/>
+          <path d="M480 304 471 280M638 312 623 275 654 254 681 255" stroke="#506358" stroke-width="7"/>
+          <path d="M662 255h22" stroke="#a36543" stroke-width="9"/>
+          <path d="M661 258q-27 19 4 68" stroke="#6c7c68" stroke-width="2"/>
+          <path d="M442 279q22-8 49-1" stroke="#684c37" stroke-width="12"/>
+          <path d="M403 406 548 401a19 19 0 0 1 0 38L403 428a11 11 0 0 1 0-22Z" stroke="#84917a" stroke-width="3"/>
+        </g>
+        <circle cx="548" cy="420" r="23" fill="#56785b" stroke="#2e5345" stroke-width="3"/>
+        <circle cx="548" cy="420" r="15" fill="#d5d4b8" stroke="#99a88e" stroke-width="2"/>
+        <!-- Far leg, behind the bird and near pedal. -->
+        <path id="farLeg" d="M506 278Q544 330 523 414" fill="none" stroke="#b98546" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+        <path id="farFoot" fill="#c18c48" stroke="#9c743f" stroke-width="2" stroke-linejoin="round"/>
+        <g id="bird">
+          <!-- Tail, soft pear-shaped body, and the long curved neck. -->
+          <path d="M454 263q-48 3-72-36 37 18 68 7l22 17" fill="#e1e5d8" stroke="#657c68" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M444 267C410 234 432 193 475 191c21-2 38 9 54 12 27 4 39-18 35-52-5-38-2-62 24-73 32-13 65 11 57 39-5 17-22 29-24 51-3 37 25 74 6 101-20 30-78 31-111 22-26 5-54-4-72-24Z" fill="#fcfaf0" stroke="#5c7464" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M443 244q18 42 73 33 69 19 98-13-11 37-91 30-63 7-80-35" fill="#e2e5d6"/>
+          <path d="M593 133q-20 40-6 75" fill="none" stroke="#e2e6d8" stroke-width="9" stroke-linecap="round"/>
+          <!-- Three little crown feathers. -->
+          <path d="M578 86q-11-15-8-23 7 1 16 14M584 80q-3-21 3-22 7 4 8 18" fill="#fcfaf0" stroke="#5c7464" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Pelican's unmistakably long beak and hanging throat pouch. -->
+          <path d="M631 116 774 136q-22 31-71 37-54 8-76-31Z" fill="url(#pouch)" stroke="#9d7748" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M633 110q72 0 151 26-62 8-151-3Z" fill="#efc977" stroke="#95774b" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M641 129 768 136" stroke="#d7a358" stroke-width="2" fill="none"/>
+          <path d="M643 144q20 21 54 20" stroke="#f8d490" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <ellipse cx="613" cy="113" rx="15" ry="16" fill="#eee9cc"/>
+          <g id="eye"><circle cx="617" cy="112" r="5.5" fill="#293e35"/><circle cx="619" cy="110" r="1.6" fill="#fffdf5"/></g>
+          <path d="M604 96q10-6 18-1" fill="none" stroke="#5f7360" stroke-width="2.5" stroke-linecap="round"/>
+          <ellipse cx="607" cy="132" rx="9" ry="5" fill="#e5b493" opacity=".65"/>
+          <!-- Scarf trails towards the back. -->
+          <path id="scarfTail" d="M590 187Q551 170 519 189T456 176L465 197Q501 214 526 201T590 200Z" fill="#cc7047" stroke="#a85b3d" stroke-width="2"/>
+          <path d="M572 176q17 12 39 4l6 17q-21 11-44-4Z" fill="#df8758" stroke="#a85b3d" stroke-width="2"/>
+          <path d="M579 180 584 195M599 182l6 14" stroke="#f3b07a" stroke-width="3"/>
+          <!-- A curved wing reaches to the handlebar. -->
+          <path d="M472 218c34-15 62 9 88 19 28 11 50 17 90 11 12-2 16 9 7 15-37 24-96 8-122-4-25 6-49-4-63-18" fill="#efefe2" stroke="#657b67" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M485 233q31 16 53 15M495 244q21 12 37 10M634 261l17-5" fill="none" stroke="#c0c9b6" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+        <path id="nearLeg" d="M518 282Q506 350 573 420" fill="none" stroke="#d49d55" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+        <path id="nearLegHighlight" fill="none" stroke="#e9b873" stroke-width="3" stroke-linecap="round"/>
+        <g id="crank" stroke="#516551" stroke-width="6" stroke-linecap="round"><path d="M520 420h56"/><circle cx="548" cy="420" r="5" fill="#eee4c5" stroke-width="2"/></g>
+        <g fill="#435a48"><rect id="farPedal" width="30" height="7" rx="3"/><rect id="nearPedal" width="30" height="7" rx="3"/></g>
+        <path id="nearFoot" fill="#e0aa5d" stroke="#a78045" stroke-width="2" stroke-linejoin="round"/>
+      </g>
+      <g id="sceneFront">
+      <g id="plantsFront"><use href="#grass" x="204" y="578" transform="scale(1.12 1)"/><use href="#grass" x="1009" y="573"/><use href="#flower" x="155" y="578"/><path d="M806 566h19m-510-11h11M77 549h14" stroke="#b1b491" stroke-width="3" stroke-linecap="round"/></g>
+      <g class="landscape" data-landscape="meadow"><g data-drift="165" data-period="1280" color="#d3a39a"><use href="#cosmos" x="53" y="586"/><use href="#cosmos" x="80" y="577"/><use href="#cosmos" x="921" y="585"/><use href="#cosmos" x="952" y="579"/><use href="#cosmos" x="988" y="588"/></g><g id="petals" fill="#f6e1cd" opacity=".85"></g></g>
+      <g class="landscape" data-landscape="autumn"><g id="leaves" fill="#b88654" opacity=".8"></g></g>
+      <g class="landscape" data-landscape="night"><g id="fireflies" fill="#f5e5a1"></g></g>
+      <g class="landscape" data-landscape="sakura"><g data-drift="165" data-period="1280" fill="#edb9cc" opacity=".85"><path d="M0 574q111-14 251 1l-3 5H0Zm844 6q139-19 276-9v9Z"/><g color="#f9dce6"><use href="#sakuraBloom" transform="translate(126 568) scale(.4)"/><use href="#sakuraBloom" transform="translate(240 574) scale(.3)"/><use href="#sakuraBloom" transform="translate(958 569) scale(.4)"/></g><path d="m88 558 8-3-4 7Zm219 8 8-3-5 7Zm523-6 8-3-4 7Zm219-6 8-3-4 7Z"/></g><g id="sakuraPetals"></g></g>
+      <g class="landscape" data-landscape="osmanthus"><g data-drift="165" data-period="1280" color="#8fa470"><use href="#osmanthusLeaf" transform="translate(50 585) rotate(-32)"/><use href="#osmanthusLeaf" transform="translate(67 585) rotate(34)"/><use href="#osmanthusLeaf" transform="translate(1030 588) rotate(-25)"/><use href="#osmanthusLeaf" transform="translate(1043 588) rotate(40)"/><use href="#osmanthusCluster" x="96" y="572"/><use href="#osmanthusCluster" x="111" y="578"/><use href="#osmanthusCluster" x="922" y="573"/><use href="#osmanthusCluster" x="942" y="577"/></g><g id="osmanthusFlorets"></g></g>
+      </g>
+    </svg>
+    <div class="scene-number" id="sceneNumber">COASTAL ROUTE — 01</div>
+  </section>
+  <nav class="routes" aria-label="选择骑行风景">
+    <button class="route" type="button" data-route="coast" aria-pressed="true"><span class="swatch" aria-hidden="true"></span><span class="route-copy"><strong>海风轻拂</strong><small>01 / 灯塔 · 帆影</small></span></button>
+    <button class="route" type="button" data-route="meadow" aria-pressed="false"><span class="swatch meadow-swatch" aria-hidden="true"></span><span class="route-copy"><strong>花野漫游</strong><small>02 / 风车 · 春花</small></span></button>
+    <button class="route" type="button" data-route="sakura" aria-pressed="false"><span class="swatch sakura-swatch" aria-hidden="true"></span><span class="route-copy"><strong>樱林听风</strong><small>03 / 粉樱 · 花雨</small></span></button>
+    <button class="route" type="button" data-route="osmanthus" aria-pressed="false"><span class="swatch osmanthus-swatch" aria-hidden="true"></span><span class="route-copy"><strong>桂径寻香</strong><small>04 / 金桂 · 碧叶</small></span></button>
+    <button class="route" type="button" data-route="autumn" aria-pressed="false"><span class="swatch autumn-swatch" aria-hidden="true"></span><span class="route-copy"><strong>秋湖拾光</strong><small>05 / 暖阳 · 落叶</small></span></button>
+    <button class="route" type="button" data-route="night" aria-pressed="false"><span class="swatch night-swatch" aria-hidden="true"></span><span class="route-copy"><strong>月下归途</strong><small>06 / 松林 · 流萤</small></span></button>
+  </nav>
+  <p class="journey-caption" id="journeyCaption" role="status" aria-live="polite">第一程 · 把心事交给海风</p>
+  <div class="controls">
+    <button id="toggle" type="button" aria-label="暂停动画"><span class="pause-icon" aria-hidden="true"></span><span id="toggleText">歇一小会</span></button>
+    <label class="speed" for="speed">骑行速度 <input id="speed" type="range" min="0.4" max="2" step="0.1" value="1"><output id="speedValue" for="speed">1.0×</output></label>
+    <label class="auto-label"><input id="autoTour" type="checkbox">自动漫游 · 每程停留 18 秒</label>
+  </div>
+  <footer><span>一段没有目的地的好时光</span><span>Enjoy the little detours.</span></footer>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let running = !reducedMotion.matches;
+  let speed = 1, time = 0, last = null, velocity = 0, acceleration = 0;
+  const button = $('toggle');
+  const nodes = Object.fromEntries(['rider', 'bird', 'eye', 'scarfTail', 'crank', 'farLeg', 'nearLeg', 'nearLegHighlight', 'farFoot', 'nearFoot', 'farPedal', 'nearPedal', 'roadMarks', 'shadow'].map(id => [id, $(id)]));
+  // Clone the rotating spokes above each static wheel face.
+  const spokeTemplate = document.querySelector('#wheel .spokes');
+  const spins = [$('rearSpin'), $('frontSpin')];
+  spins.forEach(spin => spin.appendChild(spokeTemplate.cloneNode(true)));
+  // Hide spokes in the referenced wheel; the clones rotate independently.
+  spokeTemplate.setAttribute('visibility', 'hidden');
+  const setTransform = (node, value) => node.setAttribute('transform', value);
+  const routes = {
+    coast: { subtitle: '海风刚刚好，今天不赶路。', label: '沿着海岸 · 慢慢向前', number: 'COASTAL ROUTE — 01', caption: '第一程 · 把心事交给海风', title: '一只系橘色围巾的鹈鹕，经过灯塔和帆船，在海岸边骑行' },
+    meadow: { subtitle: '穿过花开的原野，让风车慢慢转。', label: '漫过花野 · 春光作伴', number: 'MEADOW ROUTE — 02', caption: '第二程 · 每一朵花都值得路过', title: '鹈鹕骑过柔绿的田园，远处风车旋转，路边春花随风而过' },
+    sakura: { subtitle: '风经过樱花林，落了一路粉色的春天。', label: '穿过樱林 · 花雨轻落', number: 'SAKURA ROUTE — 03', caption: '第三程 · 借一阵风，赴一场花开', title: '鹈鹕骑入粉色樱花林，层叠的花冠映着柔光，带缺口的樱花瓣随风旋落' },
+    osmanthus: { subtitle: '碧叶藏着点点金黄，小径有了秋天的香。', label: '走进桂径 · 暖金作伴', number: 'OSMANTHUS ROUTE — 04', caption: '第四程 · 桂花很小，温柔刚好', title: '鹈鹕骑过桂花小径，常绿的树冠间缀着成簇四瓣金桂，细小花朵轻轻飘落' },
+    autumn: { subtitle: '湖面藏着暖阳，落叶写着秋天。', label: '路过秋湖 · 捡一束光', number: 'AUTUMN ROUTE — 05', caption: '第五程 · 在金色的午后多停一会', title: '鹈鹕在秋日湖畔骑行，赭金色树叶缓缓飘落，湖面映着暖阳' },
+    night: { subtitle: '月亮陪你回家，流萤照亮小路。', label: '骑入月色 · 星光同行', number: 'MOONLIT ROUTE — 06', caption: '第六程 · 山谷安静，月色温柔', title: '鹈鹕在月夜的山谷中骑行，松林、湖中月影与流萤陪伴归途' }
+  };
+  let activeRoute = 'coast', tourElapsed = 0, transition = null, queuedRoute = null;
+  const routeButtons = Array.from(document.querySelectorAll('[data-route]'));
+  const clamp = (x, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, x));
+  const ease = x => { x = clamp(x); return x * x * x * (x * (x * 6 - 15) + 10); };
+  function routeCopy(name) {
+    const route = routes[name];
+    document.body.dataset.scene = name;
+    $('sceneSubtitle').textContent = route.subtitle;
+    $('sceneLabel').textContent = route.label;
+    $('sceneNumber').textContent = route.number;
+    $('art-title').textContent = route.title;
+  }
+  function routeSelection(name) {
+    routeButtons.forEach(item => {
+      item.setAttribute('aria-pressed', String(item.dataset.route === name));
+      item.classList.toggle('is-pending', item.dataset.route === queuedRoute);
+    });
+  }
+  function selectRoute(name) {
+    if (!routes[name]) return;
+    tourElapsed = 0;
+    if (transition) {
+      // Keep the current crossing continuous; remember only the latest destination.
+      queuedRoute = name === transition.to ? null : name;
+      routeSelection(name);
+      $('journeyCaption').textContent = queuedRoute ? `下一程 · ${routes[name].label}` : `正在前往 · ${routes[name].label}`;
+      return;
+    }
+    if (name === activeRoute) return;
+    queuedRoute = null;
+    routeSelection(name);
+    if (reducedMotion.matches) {
+      showWorld(worlds[activeRoute], false);
+      activeRoute = name;
+      showWorld(worlds[name], true);
+      routeCopy(name);
+      $('journeyCaption').textContent = routes[name].caption;
+      draw(time);
+      return;
+    }
+    transition = { from: activeRoute, to: name, elapsed: 0, duration: 4.2, progress: 0, copied: false };
+    const next = worlds[name];
+    showWorld(next, true);
+    next.back.parentNode.appendChild(next.back);
+    next.front.parentNode.appendChild(next.front);
+    next.back.setAttribute('mask', 'url(#travel-back-mask)');
+    next.front.setAttribute('mask', 'url(#travel-front-mask)');
+    worlds[activeRoute].front.setAttribute('mask', 'url(#travel-front-out-mask)');
+    $('scene').setAttribute('aria-busy', 'true');
+    $('journeyCaption').textContent = `正在前往 · ${routes[name].label}`;
+    updateTransition(0);
+  }
+  function showWorld(world, visible) {
+    [world.back, world.front].forEach(group => { group.style.display = visible ? '' : 'none'; group.removeAttribute('mask'); });
+  }
+  function updateTransition(dt) {
+    if (!transition) return;
+    const trip = transition;
+    trip.elapsed += dt;
+    const progress = ease(trip.elapsed / trip.duration);
+    trip.progress = progress;
+    // A narrow feathered front travels from the road ahead (right) to behind (left).
+    // Foreground crosses a little earlier than the horizon, providing depth.
+    const seam = 1300 - 1480 * progress;
+    [backFront, frontFront, frontOut].forEach((gradient, i) => {
+      const edge = seam - (i ? 65 : 0) * Math.sin(progress * Math.PI);
+      gradient.setAttribute('x1', edge - 70);
+      gradient.setAttribute('x2', edge + 70);
+    });
+    if (!trip.copied && progress >= .5) { routeCopy(trip.to); trip.copied = true; }
+    if (trip.elapsed >= trip.duration) {
+      showWorld(worlds[trip.from], false);
+      showWorld(worlds[trip.to], true);
+      activeRoute = trip.to;
+      transition = null;
+      tourElapsed = 0;
+      $('scene').setAttribute('aria-busy', 'false');
+      const next = queuedRoute;
+      queuedRoute = null;
+      routeSelection(next || activeRoute);
+      $('journeyCaption').textContent = routes[activeRoute].caption;
+      if (next && next !== activeRoute) selectRoute(next);
+    }
+  }
+  routeButtons.forEach(item => item.addEventListener('click', () => selectRoute(item.dataset.route)));
+  $('autoTour').addEventListener('change', () => { tourElapsed = 0; });
+  function updateButton() {
+    button.classList.toggle('paused', !running);
+    button.setAttribute('aria-label', running ? '缓缓停下' : '缓缓出发');
+    const text = running ? (velocity < speed * .85 ? '缓缓出发' : '歇一小会') : (velocity > .015 ? '慢慢停下' : '继续出发');
+    if ($('toggleText').textContent !== text) $('toggleText').textContent = text;
+  }
+  button.addEventListener('click', () => { running = !running; updateButton(); });
+  $('speed').addEventListener('input', event => {
+    speed = Number(event.target.value);
+    $('speedValue').value = speed.toFixed(1) + '×';
+  });
+  reducedMotion.addEventListener('change', event => {
+    if (event.matches) {
+      running = false; velocity = 0; acceleration = 0; $('autoTour').checked = false;
+      if (transition) { queuedRoute = null; updateTransition(transition.duration); }
+      updateButton(); draw(time);
+    }
+  });
+  document.addEventListener('visibilitychange', () => { last = null; });
+  function leg(side, angle, bob) {
+    const x = 548 + 28 * Math.cos(angle), y = 420 + 28 * Math.sin(angle);
+    const hx = side === 'near' ? 516 : 502, hy = 284 + bob;
+    // Two rigid limb segments meet at a knee computed by inverse kinematics.
+    const dx = x - hx, dy = y - hy, distance = Math.hypot(dx, dy);
+    const upper = 89, lower = 89;
+    const a = (upper * upper - lower * lower + distance * distance) / (2 * distance);
+    const h = Math.sqrt(Math.max(0, upper * upper - a * a));
+    const kx = hx + a * dx / distance - h * dy / distance;
+    const ky = hy + a * dy / distance + h * dx / distance;
+    const d = `M${hx} ${hy}L${kx} ${ky}L${x} ${y - 4}`;
+    nodes[side + 'Leg'].setAttribute('d', d);
+    if (side === 'near') nodes.nearLegHighlight.setAttribute('d', `M${kx + 1} ${ky}L${x + 1} ${y - 8}`);
+    nodes[side + 'Foot'].setAttribute('d', `M${x - 5} ${y - 9}Q${x + 5} ${y - 12} ${x + 12} ${y - 5}L${x + 24} ${y - 1}Q${x + 28} ${y + 4} ${x + 19} ${y + 4}L${x - 8} ${y + 3}Z`);
+    nodes[side + 'Pedal'].setAttribute('x', x - 11);
+    nodes[side + 'Pedal'].setAttribute('y', y + 4);
+  }
+  function draw(t) {
+    const angle = t * 2.7, degrees = angle * 180 / Math.PI;
+    const motion = clamp(velocity);
+    const bob = Math.sin(angle * 2) * 2 * motion;
+    setTransform(nodes.rider, `translate(0 ${Math.sin(angle * 2) * .8 * motion})`);
+    setTransform(nodes.bird, `translate(0 ${bob})`);
+    spins.forEach(spin => setTransform(spin, `rotate(${degrees * 1.65})`));
+    setTransform(nodes.crank, `rotate(${degrees} 548 420)`);
+    leg('far', angle + Math.PI, bob);
+    leg('near', angle, bob);
+    const flutter = Math.sin(t * 5) * 6 * motion;
+    nodes.scarfTail.setAttribute('d', `M590 187Q551 ${170 + flutter} 519 189T456 ${176 - flutter}L465 ${197 - flutter}Q501 ${214 + flutter} 526 201T590 200Z`);
+    const blink = t % 5.4 > 5.23 ? 1 - .88 * motion : 1;
+    setTransform(nodes.eye, `translate(0 ${112 * (1 - blink)}) scale(1 ${blink})`);
+    nodes.roadMarks.setAttribute('patternTransform', `translate(${-((t * 2.7 * 1.65 * 79) % 240)} 0)`);
+    nodes.shadow.setAttribute('rx', 224 + bob * 1.3);
+    const shown = transition ? [transition.from, transition.to] : [activeRoute];
+    shown.forEach(name => drawWorld(worlds[name], t));
+    let night = activeRoute === 'night' ? 1 : 0;
+    if (transition) {
+      const local = ease((transition.progress - .35) / .3);
+      night = (transition.from === 'night' ? 1 : 0) * (1 - local) + (transition.to === 'night' ? 1 : 0) * local;
+    }
+    nodes.rider.style.filter = `brightness(${1 - .12 * night}) saturate(${1 - .22 * night})`;
+    sails.forEach(node => setTransform(node, `rotate(${t * 16} 0 -69)`));
+  }
+  function drawWorld(world, t) {
+    const slide = transition ? (world.name === transition.to ? 100 * (1 - transition.progress) : -100 * transition.progress) : 0;
+    world.scenery.forEach(({node, rate, period}) => {
+      const shift = slide * Math.min(1.5, rate / 65);
+      setTransform(node, `translate(${-((t * rate - shift + period) % period)} 0)`);
+    });
+    world.particles.forEach(({node, kind, index}) => {
+      const seed = index * 173 + (kind === 'firefly' ? 91 : 0);
+      if (kind === 'firefly') {
+        const x = (seed % 1080) + 20 + Math.sin(t * .6 + index) * 17;
+        const y = 330 + (index * 37 % 158) + Math.sin(t * .85 + index * 2) * 12;
+        setTransform(node, `translate(${x} ${y})`);
+        node.setAttribute('opacity', .25 + .65 * (Math.sin(t * 1.5 + index * 2.3) + 1) / 2);
+      } else {
+        if (kind === 'sakura' || kind === 'osmanthus') {
+          const cherry = kind === 'sakura';
+          const drift = cherry ? 26 : 17, fall = cherry ? 20 : 14;
+          const x = 1220 - ((t * drift + seed) % 1340) + Math.sin(t * .8 + index * 1.7) * (cherry ? 24 : 10);
+          const y = -50 + ((index * 97 + t * fall) % 720);
+          const size = (cherry ? .6 : .5) + (index % 4) * .12;
+          const flutter = cherry ? .65 + Math.sin(t * 1.4 + index) * .25 : 1;
+          setTransform(node, `translate(${x} ${y}) rotate(${index * 37 + t * (cherry ? 21 : 12)}) scale(${size * flutter} ${size})`);
+          node.setAttribute('opacity', .8 * ease((y + 50) / 65) * (1 - ease((y - 555) / 80)));
+        } else {
+          const x = 1190 - ((t * (kind === 'leaf' ? 40 : 29) + seed) % 1270);
+          const y = 190 + ((index * 47 + t * (kind === 'leaf' ? 13 : 6)) % 380);
+          setTransform(node, `translate(${x} ${y}) rotate(${index * 41 + t * 30}) scale(${.65 + (index % 3) * .17})`);
+        }
+      }
+    });
+    if (world.nodes.stars) world.nodes.stars.setAttribute('opacity', .75 + Math.sin(t * .7) * .15);
+  }
+  // Duplicate scenery tiles for seamless motion, without external assets.
+  function duplicateChildren(group, width) {
+    const copy = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    Array.from(group.children).forEach(child => copy.appendChild(child.cloneNode(true)));
+    setTransform(copy, `translate(${width} 0)`);
+    group.appendChild(copy);
+    return copy;
+  }
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const create = (tag, attrs = {}) => {
+    const node = document.createElementNS(svgNS, tag);
+    Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+    return node;
+  };
+  const defs = document.querySelector('#scene > defs');
+  function travelMask(id, reverse = false) {
+    const gradient = create('linearGradient', { id: `${id}-edge`, gradientUnits: 'userSpaceOnUse', x1: 1230, x2: 1370, y1: 0, y2: 0 });
+    gradient.appendChild(create('stop', {offset: 0, 'stop-color': reverse ? '#fff' : '#000'}));
+    gradient.appendChild(create('stop', {offset: 1, 'stop-color': reverse ? '#000' : '#fff'}));
+    const mask = create('mask', {id, maskUnits: 'userSpaceOnUse', maskContentUnits: 'userSpaceOnUse', x: 0, y: 0, width: 1120, height: 580, 'mask-type': 'luminance'});
+    mask.appendChild(create('rect', {width: 1120, height: 580, fill: `url(#${id}-edge)`}));
+    defs.appendChild(gradient); defs.appendChild(mask);
+    return gradient;
+  }
+  const backFront = travelMask('travel-back-mask'), frontFront = travelMask('travel-front-mask');
+  const frontOut = travelMask('travel-front-out-mask', true);
+  const backgroundTemplate = $('sceneBack'), foregroundTemplate = $('sceneFront');
+  const backHost = create('g', {id: 'backgroundWorlds'}), frontHost = create('g', {id: 'foregroundWorlds'});
+  backgroundTemplate.replaceWith(backHost); foregroundTemplate.replaceWith(frontHost);
+  const paletteKeys = ['sky-top', 'sky-bottom', 'water-top', 'water-bottom', 'hill', 'bank', 'road', 'edge', 'sun'];
+  const palettes = {
+    coast: ['#e7eee2', '#f6f1d9', '#b8d3c7', '#d3dfc9', '#c8d8bd', '#bdc99e', '#d5d3b6', '#e9e4c6', '#f3d78f'],
+    meadow: ['#e6eddf', '#faf0d5', '#c5d3a4', '#b4c58e', '#d0dbb8', '#a8bc89', '#dbd2b3', '#eee6cd', '#f4dc9d'],
+    sakura: ['#f1dee5', '#fff0e5', '#e3cbd1', '#ecd8d5', '#dac6cf', '#d4bcc1', '#e7d3cc', '#f9e8e2', '#f9e2bc'],
+    osmanthus: ['#e7e9d6', '#fbefc9', '#c5cfaa', '#d3d3a9', '#c8cfad', '#b8c18e', '#d9cea7', '#f1e5bf', '#f3d48a'],
+    autumn: ['#edddcb', '#f9e8c6', '#b9c6b1', '#d5d2ad', '#d4c2a0', '#c9b388', '#d9c4a5', '#f0dfc1', '#ecc181'],
+    night: ['#334854', '#82918d', '#6a8789', '#91a5a0', '#66817e', '#748d80', '#9aa998', '#bbc5ae', '#f3edce']
+  };
+  // Independent worlds keep day/night palettes and moving scenery isolated during the crossing.
+  function buildWorld(name) {
+    const world = { name, back: backgroundTemplate.cloneNode(true), front: foregroundTemplate.cloneNode(true), nodes: {}, scenery: [], particles: [] };
+    [world.back, world.front].forEach((group, index) => {
+      group.id = `${name}-${index ? 'front' : 'back'}`;
+      group.classList.add('world'); group.dataset.world = name;
+      paletteKeys.forEach((key, i) => group.style.setProperty(`--${key}`, palettes[name][i]));
+      group.querySelectorAll('[data-landscape]').forEach(layer => {
+        if (layer.dataset.landscape !== name) layer.remove();
+        else layer.classList.add('is-visible');
+      });
+      group.querySelectorAll('[id]').forEach(node => {
+        const original = node.id;
+        node.dataset.node = original; node.id = `${name}-${original}`;
+        world.nodes[original] = node;
+      });
+      group.querySelectorAll('[fill]').forEach(node => {
+        const fill = node.getAttribute('fill');
+        if (fill === 'url(#sky)' || fill === 'url(#sea)') node.setAttribute('fill', fill.replace('#', `#${name}-`));
+      });
+    });
+    ['sky', 'sea'].forEach((type, index) => {
+      const gradient = create('linearGradient', {id: `${name}-${type}`, x2: 0, y2: 1});
+      gradient.appendChild(create('stop', {offset: 0, 'stop-color': palettes[name][index * 2]}));
+      gradient.appendChild(create('stop', {offset: 1, 'stop-color': palettes[name][index * 2 + 1]}));
+      defs.appendChild(gradient);
+    });
+    const addScenery = (node, rate, period) => {
+      if (!node) return;
+      duplicateChildren(node, period);
+      world.scenery.push({node, rate, period});
+    };
+    addScenery(world.nodes.clouds, 7, 1250);
+    addScenery(world.nodes.waves, 19, 1120);
+    addScenery(world.nodes.plantsBack, 92, 1300);
+    addScenery(world.nodes.plantsFront, 165, 1300);
+    [world.back, world.front].forEach(group => group.querySelectorAll('[data-drift]').forEach(node => addScenery(node, Number(node.dataset.drift), Number(node.dataset.period))));
+    backHost.appendChild(world.back); frontHost.appendChild(world.front);
+    showWorld(world, name === activeRoute);
+    return world;
+  }
+  const worlds = Object.fromEntries(Object.keys(routes).map(name => [name, buildWorld(name)]));
+  // The sails live inside the reusable windmill symbol, so all its instances move together.
+  const sails = Array.from(document.querySelectorAll('.windmill-sails'));
+  Object.values(worlds).forEach(world => {
+  [['petals', 'petal', 9], ['leaves', 'leaf', 12], ['fireflies', 'firefly', 17], ['sakuraPetals', 'sakura', 30], ['osmanthusFlorets', 'osmanthus', 22]].forEach(([id, kind, count]) => {
+    if (!world.nodes[id]) return;
+    for (let index = 0; index < count; index++) {
+      const node = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      if (kind === 'firefly') {
+        [7, 2].forEach((radius, i) => {
+          const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          dot.setAttribute('r', radius);
+          dot.setAttribute('opacity', i ? '.9' : '.12');
+          node.appendChild(dot);
+        });
+      } else if (kind === 'sakura' || kind === 'osmanthus') {
+        const shape = create('use', {href: kind === 'sakura' ? '#sakuraPetal' : '#osmanthusBloom'});
+        const colors = kind === 'sakura' ? ['#e8afc5', '#f8dce6', '#d796b3', '#fff0f3'] : ['#e7bc65', '#f4d887', '#d9aa53', '#f8e5a3'];
+        shape.setAttribute('fill', colors[index % 4]);
+        shape.setAttribute('color', colors[index % 4]);
+        node.appendChild(shape);
+      } else {
+        const shape = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        shape.setAttribute('d', kind === 'leaf' ? 'M-8-2Q0-13 10-5Q7 7-8-2Z' : 'M-5 0Q-2-8 5-4Q9 3 0 5Z');
+        if (kind === 'leaf') shape.setAttribute('fill', ['#bb8757', '#d1a168', '#aa8056'][index % 3]);
+        node.appendChild(shape);
+      }
+      world.nodes[id].appendChild(node);
+      world.particles.push({node, kind, index});
+    }
+  });
+  });
+  function advanceMotion(dt) {
+    const target = running ? speed : 0;
+    // Exact critically damped response: preserve velocity AND acceleration on retargeting.
+    // Integration uses the same curve, keeping wheels, pedals and ground phase-locked.
+    const omega = 5.5, offset = velocity - target;
+    const impulse = acceleration + omega * offset, decay = Math.exp(-omega * dt);
+    const distance = target * dt + offset * (1 - decay) / omega + impulse * (1 - (1 + omega * dt) * decay) / (omega * omega);
+    velocity = Math.max(0, target + (offset + impulse * dt) * decay);
+    acceleration = (acceleration - omega * impulse * dt) * decay;
+    time += Math.max(0, distance);
+    if (Math.abs(velocity - target) < .0003 && Math.abs(acceleration) < .002) { velocity = target; acceleration = 0; }
+  }
+  function frame(now) {
+    if (last !== null && !document.hidden) {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      advanceMotion(dt);
+      updateTransition(dt);
+      if (running && !transition && $('autoTour').checked) {
+        tourElapsed += dt;
+        if (tourElapsed >= 18) {
+          const names = Object.keys(routes);
+          selectRoute(names[(names.indexOf(activeRoute) + 1) % names.length]);
+        }
+      }
+    }
+    last = now;
+    draw(time);
+    updateButton();
+    requestAnimationFrame(frame);
+  }
+  updateButton();
+  draw(0);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
+
