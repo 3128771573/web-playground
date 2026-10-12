@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>小网站游乐场</title>
+  <style>
+    :root { color-scheme: light; --ink:#31473e; --muted:#6e8176; --paper:#f7f4e9; --line:#d9dfd0; --accent:#9b6476; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(circle at 85% 13%,#f3dcd2 0 5%,transparent 20%),radial-gradient(circle at 12% 88%,#d8e4d0 0 9%,transparent 30%),var(--paper); color:var(--ink); font-family:"Segoe UI","Microsoft YaHei",sans-serif; }
+    main { width:min(960px,calc(100% - 40px)); margin:0 auto; padding:72px 0; }
+    .eyebrow { margin:0 0 14px; color:var(--muted); letter-spacing:.18em; font-size:12px; }
+    h1 { margin:0; font:500 clamp(34px,6vw,62px)/1.1 Georgia,"Songti SC",serif; letter-spacing:.08em; }
+    .intro { margin:20px 0 48px; max-width:40em; color:var(--muted); line-height:1.8; }
+    .projects { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+    .project { min-height:190px; display:flex; flex-direction:column; justify-content:flex-end; padding:24px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,#eed5df 0 47%,#d7e3cc 47% 100%); color:var(--ink); text-decoration:none; box-shadow:0 12px 30px #62736a18; transition:transform .25s ease,box-shadow .25s ease; }
+    .project:hover { transform:translateY(-5px); box-shadow:0 19px 38px #62736a2b; }
+    .project small { letter-spacing:.12em; color:#6d5961; }
+    .project h2 { margin:8px 0 0; font:500 28px Georgia,"Songti SC",serif; }
+    footer { margin-top:52px; padding-top:19px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; letter-spacing:.06em; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">A SMALL PLACE FOR LITTLE WEB EXPERIMENTS</p>
+    <h1>小网站游乐场</h1>
+    <p class="intro">收集一些会动、会发光、偶尔有点古怪的网页小项目。</p>
+    <section class="projects" aria-label="项目列表">
+      <a class="project" href="pelican-ride/" aria-label="打开鹈鹕的漫游日记">
+        <small>01 · SVG ANIMATION</small>
+        <h2>鹈鹕的漫游日记</h2>
+      </a>
+    </section>
+    <footer>Made for slow, curious afternoons.</footer>
+  </main>
+</body>
+</html>
+
